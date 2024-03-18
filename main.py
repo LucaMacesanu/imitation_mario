@@ -9,6 +9,7 @@ import cv2
 import numpy as np
 import sys
 from datetime import datetime
+import argparse
 
 # state is a 240x256 grayscale image 0-255
 # reward is some reward function that rewards you for getting closer to the end of the level
@@ -25,13 +26,24 @@ def my_call(state,action,reward,done,next_state):
 
     action_history.append(action)
     state_history.append(state)
+    reward_history.append(reward)
 
 
 
 if __name__ == "__main__":
-    global action_history, state_history
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("--user")
+    args = parser.parse_args()
+    if args.user is None:
+        print("No user is specified. Example use: python main.py --user \"luca\"")
+        raise SystemExit(1)
+
+
+    global action_history, state_history, reward_history
     action_history = []
     state_history = []
+    reward_history = []
     print(gym.__version__)
     env = GrayScaleObservation(gym.make("SuperMarioBros-v3"))
     play_human(env,callback=my_call)
@@ -39,9 +51,11 @@ if __name__ == "__main__":
     # wrap them as arrays rather than list for saving
     action_history = np.array(action_history)
     state_history = np.array(state_history)
+    reward_history = np.array(reward_history)
     history = [action_history,state_history]
     day_time = datetime.today().strftime("%m%d%y_%H%M%S")
-    np.savez("./recordings/imitation_mario_rec_" + day_time,state_history,action_history)
+
+    np.savez("./recordings/imitation_mario_rec_" + args.user + "_" + day_time,state_history,action_history)
     
 
 
