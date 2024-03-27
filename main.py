@@ -55,7 +55,7 @@ if __name__ == "__main__":
     history = [action_history,state_history,reward_history]
     day_time = datetime.today().strftime("%m%d%y_%H%M%S")
 
-    np.savez("./recordings/imitation_mario_rec_" + args.user + "_" + day_time,state_history,action_history)
+    np.savez("./recordings/imitation_mario_rec_" + args.user + "_" + day_time,state_history,action_history,reward_history)
     
 
 
