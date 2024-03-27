@@ -19,9 +19,9 @@ def my_call(state,action,reward,done,next_state):
     # print("State shape: ", state.shape)
     # print("max: ", state.max())
     # print("min: ", state.min())
-    print("Action: ",action)
+    # print("Action: ",action)
     # print("Done: ", done)
-    # print("Reward: ",reward)
+    print("Reward: ",reward)
     # print("next_state:",len(next_state))
 
     action_history.append(action)
@@ -52,7 +52,7 @@ if __name__ == "__main__":
     action_history = np.array(action_history)
     state_history = np.array(state_history)
     reward_history = np.array(reward_history)
-    history = [action_history,state_history]
+    history = [action_history,state_history,reward_history]
     day_time = datetime.today().strftime("%m%d%y_%H%M%S")
 
     np.savez("./recordings/imitation_mario_rec_" + args.user + "_" + day_time,state_history,action_history)
