@@ -10,30 +10,44 @@ import numpy as np
 import sys
 from datetime import datetime
 import argparse
+from sklearn.neural_network import MLPClassifier
+import pickle
 
 
-class ReplayAgent:
-    def __init__(self,action_history):
-        self.index = 0
-        self.max = len(action_history)
-        self.action_history = action_history
+class MLPAgent:
+    def __init__(self, model = None):
         self.done = False
-        self.name = "replay_agent"
+        self.name = "mlp_agent"
+        if model is None:
+            self.model = MLPClassifier(hidden_layer_sizes=10)
+        else:
+            self.model = model
+
 
     def get_action(self,state):
-        if self.index == self.max - 1:
-            print("End of recording reached")
-            self.done = True
-            return 0
-        else:
-            action = self.action_history[self.index]
-            self.index += 1
-            return action
+        state = state.flatten().reshape(1,-1)
+        return self.model.predict(state)
+        
+    def train(self, state_history,action_history):
+        print("Training...")
+        nsamples, nx, ny = state_history.shape
+        d2_train_dataset = state_history.reshape((nsamples,nx*ny))
+        self.model.fit(d2_train_dataset,action_history)
+        pickle.dump(self.model,open( "models/mlp_model.p", "wb" ))
+        print("Training Complete.")
+
+
+def rgb2gray(rgb):
+
+    r, g, b = rgb[:,:,0], rgb[:,:,1], rgb[:,:,2]
+    gray = 0.2989 * r + 0.5870 * g + 0.1140 * b
+
+    return gray
 
 def run_agent(agent):
 
     # Initialize environment without GrayScaleObservation wrapper
-    env = gym.make("SuperMarioBros-v3")
+    env = GrayScaleObservation(gym.make("SuperMarioBros-v3"))
     env.reset()  # Reset the environment before starting playback
 
     # setup histories for recordin
@@ -41,13 +55,14 @@ def run_agent(agent):
     state_history = []
     reward_history = []
 
-    action = 0
+    action = [0]
     done = False
     while not done:
 
         
         # Apply action to environment
         state, reward, done, _ = env.step(action)
+        
         action_history.append(action)
         state_history.append(state)
         reward_history.append(reward)
@@ -55,13 +70,8 @@ def run_agent(agent):
         action = agent.get_action(state)
         
         # Render the environment
-        cv2.imshow("Playback", state)
-        cv2.waitKey(5)  # Adjust the delay between frames if needed
-
-        # Check if the episode is done
-        # if reward == -15:
-        #     print("Agent Died")
-        #     break
+        # cv2.imshow("Playback", state)
+        # cv2.waitKey(5)  # Adjust the delay between frames if needed
 
         if done:
             print("Done")
@@ -89,12 +99,15 @@ def run_agent(agent):
 
 #Specifically for the recording agent
 if __name__ == "__main__":
-    record_file = "agent_recordings/mlp_agent_032824_180805.npz"  # Path to your recorded data
+    record_file = "recordings\imitation_mario_rec_luca_032724_181035.npz"  # Path to your recorded data
     data = np.load(record_file)
     #print(sorted(data))
     rec_state_history = data['arr_0']
     rec_action_history = data['arr_1']
     rec_reward_history = data['arr_2']
-    agent = ReplayAgent(rec_action_history)
-    print("max reward: ",rec_reward_history.max())
+    pickled_model = open("models/mlp_model.p", "rb")
+    mlp_model = pickle.load(pickled_model)
+    agent = MLPAgent(mlp_model)
+    pickled_model.close()
+    # agent.train(rec_state_history,rec_action_history)
     run_agent(agent)

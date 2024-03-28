@@ -1,0 +1,27 @@
+Data Cleaning:
+! processing action space
+! seperating out second stage recordings
+! Seperating recordings into "runs" (split by death and wins)
+! Rejecting low quality runs
+! fixing action space
+
+Data Exploration:
+- visualizing replays
+- custom data collection*
+- score/time
+! histograms of stats for all data collected
+! average loss between close states
+
+Feature Engineering:
+! merging output classes
+
+Modelling:
+- replay agent
+! do cross evaluation
+! mlp
+! cnn
+! knn
+! rrt
+! 
+! random disturbances to check how the policy works in out of distribution scenarios
+! behavior cloning
