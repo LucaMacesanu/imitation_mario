@@ -61,7 +61,7 @@ def eliminate_unecessary_action(data):
     #Given an array of actions, replace all actions that do not move mario in a specific way
     action_space = data['arr_1']
     for i in range (action_space.size):
-        if (action_space[i] is not 64 or 65 or 66 or 67 or 128 or 129 or 130 or 131 or 1):
+        if (action_space[i] != 64 or 65 or 66 or 67 or 128 or 129 or 130 or 131 or 1):
             action_space[i] == 0
 
 
@@ -156,19 +156,49 @@ def playback(record_file):
     env.close()
     cv2.destroyAllWindows()
 
+def get_state_action_pairs(n):
+    recordings_dir = "./recordings"
+    state_history = np.array([])
+    action_history = np.array([])
+    filenames = os.listdir(recordings_dir)
+    for i in range(min(n,len(filenames))):
+        filename = filenames[i]
+        if filename.endswith(".npz"):
+            print("Adding ", filename)
+            record_file = os.path.join(recordings_dir, filename)
+            data = np.load(record_file)
+            if (state_history.size == 0):
+                state_history = data['arr_0']
+                action_history = data['arr_1']
+            else:
+                state_history = np.concatenate([state_history, data['arr_0']], axis=0)
+                action_history = np.concatenate([action_history, data['arr_1']], axis=0)
+    return state_history, action_history
+
+
 
 if __name__ == "__main__":
     #record_file = "./recordings/imitation_mario_rec_samik_032824_144523.npz"  # Path to your recorded data
     #playback(record_file)
-    recordings_dir = "./recordings"
-    for filename in os.listdir(recordings_dir):
-        if filename.endswith(".npz"):
-            record_file = os.path.join(recordings_dir, filename)
-            print("----------------------------------------")
-            print("Processing file:", record_file)
-            try:
-                playback(record_file)
-            except KeyError:
-                raise Exception(f"Data in file {record_file} does not have key 'arr_2'")
+    # count = 0
+    # recordings_dir = "./recordings"
+    # for filename in os.listdir(recordings_dir):
+    #     if filename.endswith(".npz"):
+    #         record_file = os.path.join(recordings_dir, filename)
+    #         print("----------------------------------------")
+    #         print("Processing file:", record_file)
+    #         try:
+    #             playback(record_file)
+    #         except KeyError:
+    #             count += 1
+    #             # print(f"Data in file {record_file} does not have key 'arr_2'")
+    state_history, action_history = get_state_action_pairs(3)
+                
+
+    # print("invalid count:",count)eci
+            
+
+            
+               
 
 

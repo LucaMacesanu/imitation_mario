@@ -89,7 +89,7 @@ def run_agent(agent):
 
 #Specifically for the recording agent
 if __name__ == "__main__":
-    record_file = "agent_recordings/mlp_agent_032824_180805.npz"  # Path to your recorded data
+    record_file = "agent_recordings\mlp_agent_040424_160131.npz"  # Path to your recorded data
     data = np.load(record_file)
     #print(sorted(data))
     rec_state_history = data['arr_0']
