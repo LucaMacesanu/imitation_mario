@@ -12,6 +12,7 @@ from datetime import datetime
 import argparse
 from sklearn.ensemble import *
 import pickle
+from playback import get_state_action_pairs
 
 class EnsembleAgent:
     def __init__(self, model = None):
@@ -91,14 +92,12 @@ def run_agent(agent):
 #Specifically for the recording agent
 if __name__ == "__main__":
     record_file = "recordings\imitation_mario_rec_luca_032724_181035.npz"  # Path to your recorded data
-    data = np.load(record_file)
-    #print(sorted(data))
-    rec_state_history = data['arr_0']
-    rec_action_history = data['arr_1']
-    rec_reward_history = data['arr_2']
-    pickled_model = open("models/ensemble_model.p", "rb")
-    ensemble_model = pickle.load(pickled_model)
-    agent = EnsembleAgent(ensemble_model) #Can set the ensembling algorithm as AdaBoostClassifier()
-    pickled_model.close()
-    # agent.train(rec_state_history,rec_action_history)
+    rec_state_history, rec_action_history = get_state_action_pairs(3)
+    # rec_reward_history = data['arr_2']
+    # pickled_model = open("models/ensemble_model.p", "rb")
+    # ensemble_model = pickle.load(pickled_model)
+    # agent = EnsembleAgent(ensemble_model) #Can set the ensembling algorithm as AdaBoostClassifier()
+    agent = EnsembleAgent()
+    # pickled_model.close()
+    agent.train(rec_state_history,rec_action_history)
     run_agent(agent)

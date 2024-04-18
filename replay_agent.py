@@ -89,12 +89,12 @@ def run_agent(agent):
 
 #Specifically for the recording agent
 if __name__ == "__main__":
-    record_file = "agent_recordings\mlp_agent_040424_160131.npz"  # Path to your recorded data
+    record_file = "./recordings/imitation_mario_rec_Carson_032624_141653.npz"  # Path to your recorded data
     data = np.load(record_file)
     #print(sorted(data))
     rec_state_history = data['arr_0']
     rec_action_history = data['arr_1']
-    rec_reward_history = data['arr_2']
+    # rec_reward_history = data['arr_2']
     agent = ReplayAgent(rec_action_history)
-    print("max reward: ",rec_reward_history.max())
+    # print("max reward: ",rec_reward_history.max())
     run_agent(agent)
