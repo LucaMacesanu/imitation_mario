@@ -16,11 +16,11 @@ from playback import get_state_action_pairs
 from sklearn.model_selection import *
 
 class BoostingAgent:
-    def __init__(self, model = None):
+    def __init__(self, model = None, n_estimators = 50):
         self.done = False
         self.name = "boosting_agent"
         if model is None:
-            self.model = AdaBoostClassifier()
+            self.model = AdaBoostClassifier(n_estimators = n_estimators)
         else:
             self.model = model
 
@@ -42,8 +42,10 @@ class BoostingAgent:
         gridsearch.fit(features, labels)
         nested_cross_validation_score = cross_val_score(gridsearch, features, labels, cv = cv)
 
-        print('Best Parameters:', gridsearch.best_params_)
-        print('Tuned, nested accuracy:', nested_cross_validation_score.mean()*100)
+        print('Best Parameters for boosting agent:', gridsearch.best_params_)
+        print('Tuned, nested accuracy for boosting agent using best parameters:', nested_cross_validation_score.mean()*100)
+        return(gridsearch.best_params_)
+    
 
     
     

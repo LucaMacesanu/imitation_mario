@@ -40,10 +40,10 @@ class EnsembleAgent:
         # parameters = {'max_depth':[35+i for i in range(11)], 'min_samples_leaf':[8, 10, 12], 'max_features':['sqrt', 'log2']}
         gridsearch = GridSearchCV(self.model, parameters, cv = cv, scoring = 'accuracy')
         gridsearch.fit(features, labels)
-        nested_cross_validation_score = cross_val_score(gridsearch, features, labels, cv = 5)
+        nested_cross_validation_score = cross_val_score(gridsearch, features, labels, cv = cv)
 
-        print('Best Parameters:', gridsearch.best_params_)
-        print('Tuned, nested accuracy:', nested_cross_validation_score.mean()*100)
+        print('Best Parameters for RFC agent:', gridsearch.best_params_)
+        print('Tuned, nested accuracy for RFC agent:', nested_cross_validation_score.mean()*100)
 
     
     
