@@ -15,14 +15,14 @@ import pickle
 from playback import get_state_action_pairs
 from sklearn.model_selection import *
 
-class EnsembleAgent:
+class BoostingAgent:
     def __init__(self, model = None):
         self.done = False
-        self.name = "ensemble_agent"
+        self.name = "boosting_agent"
         if model is None:
-            self.model = RandomForestClassifier()
+            self.model = AdaBoostClassifier()
         else:
-            self.model = model #Model can be ADABooster
+            self.model = model
 
     def get_action(self,state):
         state = state.flatten().reshape(1,-1)
@@ -33,14 +33,14 @@ class EnsembleAgent:
         nsamples, nx, ny = state_history.shape
         d2_train_dataset = state_history.reshape((nsamples,nx*ny))
         self.model.fit(d2_train_dataset,action_history)
-        pickle.dump(self.model,open( "models/ensemble_model.p", "wb" )) #Note this might not work, need to check what "ensemble_model" is
+        pickle.dump(self.model,open( "models/booster_model.p", "wb" ))
         print("Training Complete.")
 
     def evaluate(self, features, labels, cv, parameters):
         # parameters = {'max_depth':[35+i for i in range(11)], 'min_samples_leaf':[8, 10, 12], 'max_features':['sqrt', 'log2']}
         gridsearch = GridSearchCV(self.model, parameters, cv = cv, scoring = 'accuracy')
         gridsearch.fit(features, labels)
-        nested_cross_validation_score = cross_val_score(gridsearch, features, labels, cv = 5)
+        nested_cross_validation_score = cross_val_score(gridsearch, features, labels, cv = cv)
 
         print('Best Parameters:', gridsearch.best_params_)
         print('Tuned, nested accuracy:', nested_cross_validation_score.mean()*100)
@@ -107,7 +107,7 @@ if __name__ == "__main__":
     # pickled_model = open("models/ensemble_model.p", "rb")
     # ensemble_model = pickle.load(pickled_model)
     # agent = EnsembleAgent(ensemble_model) #Can set the ensembling algorithm as AdaBoostClassifier()
-    agent = EnsembleAgent()
+    agent = BoostingAgent()
     # pickled_model.close()
     agent.train(rec_state_history,rec_action_history)
     run_agent(agent)
