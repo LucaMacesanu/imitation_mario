@@ -13,6 +13,7 @@ import argparse
 from sklearn.ensemble import *
 import pickle
 from playback import get_state_action_pairs
+from sklearn.model_selection import *
 
 class EnsembleAgent:
     def __init__(self, model = None):
@@ -34,6 +35,15 @@ class EnsembleAgent:
         self.model.fit(d2_train_dataset,action_history)
         pickle.dump(self.model,open( "models/ensemble_model.p", "wb" )) #Note this might not work, need to check what "ensemble_model" is
         print("Training Complete.")
+
+    def evaluate(self, features, labels, cv, parameters):
+        # parameters = {'max_depth':[35+i for i in range(11)], 'min_samples_leaf':[8, 10, 12], 'max_features':['sqrt', 'log2']}
+        gridsearch = GridSearchCV(self.model, parameters, cv = cv, scoring = 'accuracy')
+        gridsearch.fit(features, labels)
+        nested_cross_validation_score = cross_val_score(gridsearch, features, labels, cv = 5)
+
+        print('Best Parameters:', gridsearch.best_params_)
+        print('Tuned, nested accuracy:', nested_cross_validation_score.mean()*100)
 
     
     
