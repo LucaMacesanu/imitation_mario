@@ -48,6 +48,8 @@ class dataloader:
 
         # print("indexes: %3d - %3d" % (self.subindex, stop))
         states =  data['arr_0'][self.subindex: stop]
+        #normalize the observation space
+        states = states / 255
         actions = data['arr_1'][self.subindex: stop]
         if self.requires_reward:
             rewards = data['arr_2'][self.subindex: stop]
