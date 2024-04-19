@@ -1,6 +1,6 @@
 import numpy as np
 import tensorflow as tf
-import gym
+import gym # 0.25.02
 import os
 from nes_py.wrappers import JoypadSpace
 from gym_super_mario_bros.actions import SIMPLE_MOVEMENT
