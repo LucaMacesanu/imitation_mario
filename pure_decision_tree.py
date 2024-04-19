@@ -18,7 +18,7 @@ from sklearn.model_selection import *
 class DecisionTree:
     def __init__(self, model = None, max_d = 10):
         self.done = False
-        self.name = "boosting_agent"
+        self.name = "decision_tree"
         if model is None:
             self.model = tree.DecisionTreeClassifier(criterion='entropy', max_depth=max_d)
         else:
@@ -42,8 +42,8 @@ class DecisionTree:
         gridsearch.fit(features, labels)
         nested_cross_validation_score = cross_val_score(gridsearch, features, labels, cv = cv)
 
-        print('Best Parameters for boosting agent:', gridsearch.best_params_)
-        print('Tuned, nested accuracy for boosting agent using best parameters:', nested_cross_validation_score.mean()*100)
+        print('Best Parameters for decision tree:', gridsearch.best_params_)
+        print('Tuned, nested accuracy for decision tree using best parameters:', nested_cross_validation_score.mean()*100)
         return(gridsearch.best_params_)
     
 
