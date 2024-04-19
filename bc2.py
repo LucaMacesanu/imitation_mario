@@ -35,6 +35,10 @@ class dataloader:
         print("Path: ", path)
         data = np.load(path)
 
+        if self.index >= self.n_files:  # Check if all files have been processed
+            self.done = True
+            return None  # No more data to process
+
         # if this recording is invalid move on to the next one if it exists
         if len(data.keys()) != 3 and self.requires_reward:
             if(self.index == self.n_files- 1):
@@ -77,10 +81,13 @@ class dataloader:
             return (states,actions)
 
 #Define Model
+num_actions = 300
 model = tf.keras.Sequential([
-    tf.keras.layers.Dense(128, activation='relu', input_shape=(env.observation_space.shape[0],)),
-    tf.keras.layers.Dense(len(SIMPLE_MOVEMENT), activation='softmax')
+    tf.keras.layers.Flatten(input_shape=(240, 256)),  # Assuming input dimensions are correct
+    tf.keras.layers.Dense(128, activation='relu'),
+    tf.keras.layers.Dense(num_actions, activation='softmax')  # num_actions should match the number of unique labels in your dataset
 ])
+
 
 optimizer = tf.keras.optimizers.Adam()
 loss_fn = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
@@ -95,20 +102,27 @@ def train_on_batch(states, actions):
     optimizer.apply_gradients(zip(gradients, model.trainable_variables))
     return loss
 
+#save the model
+
+def save_model(epoch, model, save_path='model_checkpoints'):
+    model.save(os.path.join(save_path, f'model_epoch_{epoch}.h5'))
+
 # Initialize dataloader CAN REMOVE WHEN INTEGRATED
-dl = dataloader(filepath="./recordings", batch_size=100, requires_reward=False)
+dl = dataloader(filepath="./rec_test", batch_size=100, requires_reward=False)
 
 
 #EDIT WITH INTEGRATION, IDEALLY GET DATA AND THEN USE TUPLES
 n_epochs = 10
 for epoch in range(n_epochs):
     i = 0
-    while not dataloader.done:
-        data = dataloader.get_next_batch()
+    while not dl.done:
+        data = dl.get_next_batch()
         loss = train_on_batch(data[0], data[1])
         print(f"Epoch {epoch}, Loss: {loss.numpy()}")
         if data is not None:
             st,ac = dl.get_next_batch()
             print("%3d: index: %3d len: %3d" % (i,dl.index, len(st)))
             i += 1
-    dataloader.reset()
+    save_model(epoch, model)
+    dl.reset()
+
