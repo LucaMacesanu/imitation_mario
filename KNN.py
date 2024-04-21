@@ -16,11 +16,23 @@ import pickle
 from playback import get_state_action_pairs
 from sklearn.model_selection import *
 import sklearn as sk
+'''
+Description:
+We used KNN as another example as to why our agent should not use classification methods using state-action pairsto solve the issue.
+Initially, KNN needs all of its moves to be scaled into a determined set. Since there is so much different terrain, 
+Another issue for KNN is the curse of dimensionality. This dataset is composed of two numpy arrays: a 3D array that describes the environment
+and a 1D array that describes the action taken. In many cases in training, our players did drastically different actions at the same observation or
+the same action at a slightly different observation. Therefore, KNN has difficulties in finding similarities between records. This resulted in our KNN model
+taking vast amounts of time for training and thus not finishing. 
 
+
+'''
 class knn:
     def __init__(self, model = None, n_n= 10):
         self.done = False
-        self.name = "boosting_agent"
+        self.name = "KNN"
+
+        #generates a pipeline that scales and decreases dimensions. 
         if model is None:
             pline = Pipeline([('scaler', sk.preprocessing.StandardScaler()), ('pca', sk.decomposition.PCA()), 
                   ('knn', KNeighborsClassifier(n_neighbors= n_n))])
@@ -41,13 +53,12 @@ class knn:
         print("Training Complete.")
 
     def evaluate(self, features, labels, cv, parameters):
-        # parameters = {'max_depth':[35+i for i in range(11)], 'min_samples_leaf':[8, 10, 12], 'max_features':['sqrt', 'log2']}
         gridsearch = GridSearchCV(self.model, parameters, cv = cv, scoring = 'accuracy')
         gridsearch.fit(features, labels)
         nested_cross_validation_score = cross_val_score(gridsearch, features, labels, cv = cv)
 
-        print('Best Parameters for boosting agent:', gridsearch.best_params_)
-        print('Tuned, nested accuracy for boosting agent using best parameters:', nested_cross_validation_score.mean()*100)
+        print('Best Parameters for KNN:', gridsearch.best_params_)
+        print('Tuned, nested accuracy for KNN using best parameters:', nested_cross_validation_score.mean()*100)
         return(gridsearch.best_params_)
     
 
@@ -109,11 +120,6 @@ def run_agent(agent):
 if __name__ == "__main__":
     record_file = "recordings\imitation_mario_rec_carson_032124_142721.npz"  # Path to your recorded data
     rec_state_history, rec_action_history = get_state_action_pairs(3)
-    # rec_reward_history = data['arr_2']
-    # pickled_model = open("models/ensemble_model.p", "rb")
-    # ensemble_model = pickle.load(pickled_model)
-    # agent = EnsembleAgent(ensemble_model) #Can set the ensembling algorithm as AdaBoostClassifier()
     agent = knn()
-    # pickled_model.close()
     agent.train(rec_state_history,rec_action_history)
     run_agent(agent)

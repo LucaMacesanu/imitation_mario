@@ -15,6 +15,18 @@ import pickle
 from playback import get_state_action_pairs
 from sklearn.model_selection import *
 
+
+'''
+Description:
+We also used a decision tree to furhter demonstrate how classification using state-action pairs was inappropriate for our problem. 
+
+Our data is filled with many occurrences of the same observation but slightly different actions in reaction to the same environment. 
+In one run, the same person could jump at a frame earlier and thus not jump at the consequent frame or the same person could jump
+at the consequent frame and not do anything in the frame prior. This as a result, makes it difficult for the agent to draw similarities
+between runs, making it hard for the tree to fit an action to a specific state. 
+
+
+'''
 class DecisionTree:
     def __init__(self, model = None, max_d = 10):
         self.done = False
@@ -105,11 +117,6 @@ def run_agent(agent):
 if __name__ == "__main__":
     record_file = "recordings\imitation_mario_rec_carson_032124_142721.npz"  # Path to your recorded data
     rec_state_history, rec_action_history = get_state_action_pairs(3)
-    # rec_reward_history = data['arr_2']
-    # pickled_model = open("models/ensemble_model.p", "rb")
-    # ensemble_model = pickle.load(pickled_model)
-    # agent = EnsembleAgent(ensemble_model) #Can set the ensembling algorithm as AdaBoostClassifier()
     agent = DecisionTree()
-    # pickled_model.close()
     agent.train(rec_state_history,rec_action_history)
     run_agent(agent)
