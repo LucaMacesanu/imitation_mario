@@ -8,6 +8,7 @@ class dataloader:
         self.filepath = filepath
         self.batch_size = batch_size
         self.requires_reward = requires_reward
+        self.count = 0
 
         # get the total number of files available
         self.file_names = os.listdir(filepath)
@@ -41,6 +42,7 @@ class dataloader:
             
         
         stop = min(self.subindex + self.batch_size, len(data['arr_0']))
+        self.count += self.batch_size
         
 
         # if weve reached the end of this recording move on to the next recording
@@ -69,11 +71,15 @@ class dataloader:
             return (states,actions)
         
 if __name__ == "__main__":
-    dl = dataloader(filepath="./recordings", batch_size=100, requires_reward=False)
+    dl = dataloader(filepath="./recordings", batch_size=5000, requires_reward=False)
     i = 0
+    count = 0
     while not dl.done:
         data = dl.get_next_batch()
         if data is not None:
-            st,ac = dl.get_next_batch()
+            st,ac = data
             print("%3d: index: %3d len: %3d" % (i,dl.index, len(st)))
+            count += len(st)
+            print("count ",count)
             i += 1
+    print("count: ", count)
