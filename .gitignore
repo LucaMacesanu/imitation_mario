@@ -2,3 +2,4 @@ recordings/*
 agent_recordings/*
 models/*
 *logs*
+/__pycache__
